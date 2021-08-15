@@ -49,6 +49,9 @@ for image in os.listdir('images'):
 
 
 
+
+
+
 cas = time.process_time()
 print(cas)
 

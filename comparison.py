@@ -3,9 +3,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-img = cv.imread('newimages/table_screenShot5.png',0)
+img = cv.imread('current_table.png',0)
 img2 = img.copy()
-template = cv.imread('chrome.png',0)
+template = cv.imread('current_card.png',0)
 w, h = template.shape[::-1]
 print('začetek')
 
