@@ -5,6 +5,7 @@ import keyboard
 import sys
 import os
 import numpy as np
+from random import choice, randint
 
 method = eval('cv.TM_SQDIFF_NORMED')
 
@@ -39,14 +40,15 @@ def naked_suit():  #returns number of the title image
     if len(os.listdir('cards')) == 0:
         return 0
     last_one = os.listdir('cards')[-1]
-    #print(last_one)
+    print(last_one)
     first_part = last_one.split('.')[0]
-    #print(first_part)
+    print(first_part)
     number = ''
-    #print(number)
-    for i in last_one:
+    print(number)
+    for i in first_part:
         if i.isnumeric():
-            number += i
+            print(i)
+            number = number + i
     return int(number)
 
 
@@ -61,8 +63,17 @@ def number_of_files(directory):
 #print(pt.locateOnScreen('cards/suit1.png'))
 
 def images_the_same(image1, image2):
-    im1 = cv.imread(f'{image1}')
-    im2 = cv.imread(f'{image2}')
+    """
+
+    :param image1: path of image1
+    :param image2: path of image2
+    :return: True if images are the same, False if images are not the same
+    """
+    im1 = cv.imread(image1)
+    im2 = cv.imread(image2)
+
+    if im1.shape != im2.shape:
+        return False
 
     difference = cv.subtract(im1, im2)
     b, g, r = cv.split(difference)
@@ -78,3 +89,21 @@ def images_the_same(image1, image2):
 #print(coordinates_of_image('cards/suit2.png', 'current_table.png'))
 #print(time.process_time())
 
+
+
+def random_name():
+    num = randint(1, 1000)
+    letter = choice(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',                 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'z'])
+    return f'{num}{letter}'
+
+#im1 = cv.imread('suits/806g.png')
+#im2 = cv.imread('current_suit.png')
+
+#if im1.shape == im2.shape:
+    #rint('sliki sta istih dimenzij')
+#else:
+    #print('sliki nista istih dimenziji')
+
+#print(images_the_same('suits/806g.png', 'current_table.png'))
+for im in os.listdir('suits'):
+    print(im)
