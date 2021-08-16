@@ -7,6 +7,7 @@ import os
 import numpy as np
 from coordinates import naked_suit, number_of_files, images_the_same, coordinates_of_image, random_name
 from random import randint, choice
+import csv
 
 #print((3,3,3) == (2,2,2))
 #print(cv.imread('cards/suit0.png'))
@@ -50,20 +51,24 @@ while True:
             cv.imwrite('current_suit.png', gray_suit_screenshot)
 
             if not os.listdir('suits'):
+                print('SUITS: direktorij je prazen, zato shranimo nek.png vanj')
                 current = cv.imread('current_suit.png')
                 lenum = random_name()
                 cv.imwrite(f'suits/{lenum}.png', current)
 
             else:
+                print('ker SUITS direktorij ni prazen gremo pregledovat ali se katera slika ujame z našo trenutno')
                 for im in os.listdir('suits'):
                     #image = cv.imread(f'suits/{im}')
                     #current = cv.imread('current_suit.png')
 
                     if images_the_same(f'suits/{im}', 'current_suit.png'):
+                        print('ker smo ujeli ujemajočo sliko, zaključimo zanko, saj to sliko že imamo v direktoriju')
+                        print(im)
                         print('sliki sta enaki')
                         break
                 else:
-                    print('ker se slika ni ujemala z nobeno sliku+o iz direktorija suits, jo bomo shranili vanj')
+                    print('ker se slika ni ujemala z nobeno sliko iz direktorija SUITS, jo bomo shranili vanj')
                     current = cv.imread('current_suit.png')
                     lenum = random_name()
                     cv.imwrite(f'suits/{lenum}.png', current)
@@ -72,6 +77,7 @@ while True:
 
         #if directory has no image files, then program automatically adds current template (current_card)
         if number_of_files('cards') == 0:
+            print('SHRANIM SLIKO v CARDS, ker je ta direktorij prazen')
             cv.imwrite(f'cards/firstone.png', current_card)
 
         else:
@@ -101,7 +107,7 @@ while True:
                     #print(f'min_val: {min_val}, max_val: {max_val}, min_loc: {min_loc}, max_loc: {max_loc}')
                     #print('-' * 50)
                     #print('Images are the same')
-
+                    print('CARDS: slika se ujema z neko sliko v direktoriju, zato prekinemo zanko')
                     break #if two photos are identical the for loop is broken becouse we know that there is already the
                     #picture of that card in cards directory
 
@@ -109,28 +115,43 @@ while True:
             #if there was no match while looping and comparing template image to images in directory, that means, there
             #is not a picture that is the same to template photo, so, we add image to cards directory
             else:  #newnew
+                print('CARDS: slika se ne ujema z nobeno sliko v direktoriju cards, zato jo shranimo vanj')
                 lenum = random_name() #gives random name in string
                 #num = naked_suit() + 1
                 cv.imwrite(f'cards/{lenum}.png', gray_card_screenshot)
 
             #when cards directory reaches lenght of 52, while loop breaks
-            if number_of_files('cards') == 52:
-                print('There are 52 cards in directory already...')
-                break
+        if number_of_files('cards') == 52:
+            print('There are 52 cards in directory already...')
+            break
+
+        print('---------------------smo pred ZADNJO ZANKO:------------------------')
+        for im in os.listdir('cards'):
+
+            temp = cv.imread(f'cards/{im}')
+            img = cv.imread(f'current_table.png')
+            res = cv.matchTemplate(img, temp, cv.TM_CCOEFF_NORMED) #max_loc for that method
+            threshold = 0.99
+            #loc = np.where(res >= threshold)
+            min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+            if max_val >= threshold: #if found
+                print('ZADNJA ZANKA: našli smo enako sliko')
+                print(f'trenutna karta: current_table.png : karta iz os.listdir(cards) {im}')
+                print(f'min_val: {min_val}, max_val: {max_val}, min_loc: {min_loc}, max_loc: {max_loc}')
+                print('našli smo max_val == treshold, zato zapišemo koordinate v file')
+                with open('coordinates_of_images/coordinates_of_cards.csv', 'a', newline='') as f:
+                    tup = max_loc
+                    writer = csv.writer(f)
+                    writer.writerow(tup)
+            else:
+                print('ZADNJA ZANKA: ni bilo zadetka')
+                print(f'min_val: {min_val}, max_val: {max_val}, min_loc: {min_loc}, max_loc: {max_loc}')
 
 
-            for im in os.listdir('cards'):
-                print('-' * 50)
-                temp = cv.imread(f'cards/{im}')
-                img = cv.imread(f'current_table.png')
-                res = cv.matchTemplate(img, temp, cv.TM_CCOEFF_NORMED) #max_loc for that method
-                threshold = 1
-                #loc = np.where(res >= threshold)
-                min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-                if max_val == threshold: #if found
-                    print(im)
-                    print(f'min_val: {min_val}, max_val: {max_val}, min_loc: {min_loc}, max_loc: {max_loc}')
-                #print('-' * 50)
+            #print('-' * 50)
+
+        print('---------------KONEC TRENUTNEGA WHILE LOOPA--------------------------------------')
+        print('')
 
 
 

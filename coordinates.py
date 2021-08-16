@@ -105,5 +105,3 @@ def random_name():
     #print('sliki nista istih dimenziji')
 
 #print(images_the_same('suits/806g.png', 'current_table.png'))
-for im in os.listdir('suits'):
-    print(im)
