@@ -5,9 +5,11 @@ import keyboard
 import sys
 import os
 import numpy as np
-from coordinates import naked_suit, number_of_files, images_the_same, coordinates_of_image, random_name
+from coordinates import number_of_files, images_the_same, coordinates_of_image, random_name
 from random import randint, choice
 import csv
+from capture_picture import capture_card, capture_dealer_coin, capture_suit, capture_table
+from dealing_with_csv import cards_csv, suits_csv, dealer_csv
 
 #print((3,3,3) == (2,2,2))
 #print(cv.imread('cards/suit0.png'))
@@ -17,44 +19,39 @@ import csv
 time.sleep(3)
 print('zdaj')
 
-
-
 method = eval('cv.TM_SQDIFF_NORMED') #comparison method
-
 while True:
     key_pressed = keyboard.read_key()
     if key_pressed == 'p':
         #takes screen shot of the table, than reads image trough cv,
         # than convertes it in gray color and than saves it in directory
-        table_screenshot = pt.screenshot('current_table.png')
-        table_image = cv.imread('current_table.png')
-        gray_table_screenshot = cv.cvtColor(table_image, cv.COLOR_BGR2GRAY)
-        cv.imwrite('current_table.png', gray_table_screenshot)
+        capture_table() #takes screnshot of full screen...
 
         #same as table screenshot, only that here takes a screenshot of a
         # region of the same picture (takes a screenshot of a card)
-        card_screenshot = pt.screenshot(f'current_card.png', region=(16, 501, 59, 59))
-        gray_card_screenshot_read = cv.imread(f'current_card.png')
-        gray_card_screenshot = cv.cvtColor(gray_card_screenshot_read, cv.COLOR_BGR2GRAY)
-        cv.imwrite('current_card.png', gray_card_screenshot)
-
+        capture_card(16,501,59,59) #screenshot my left card and saves it as 'current_card.png'
         current_card = cv.imread('current_card.png')
 
 
-        #newnewnewnew
+        if not os.listdir('dealer_coin'): #screenshot of my dealer_button
+            #function saves screenshot of a dealer button to dealer_coin directory
+            capture_dealer_coin(1000, 501, 200, 200) #takes shot of dealer coin and saves it only when dealer_coin directory is empty
+
+
         #checking if there are 4 images in suits directory already. if not, starts the process..
         if len(os.listdir('suits')) != 4:
+            capture_suit(16,501,30,30)
             #takes smaller screenshot area, only to capture suit of the card
-            suit_screenshot = pt.screenshot(f'current_suit.png', region=(16, 501, 30, 30))
-            gray_suit_screenshot_read = cv.imread(f'current_suit.png')
-            gray_suit_screenshot = cv.cvtColor(gray_suit_screenshot_read, cv.COLOR_BGR2GRAY)
-            cv.imwrite('current_suit.png', gray_suit_screenshot)
+            #suit_screenshot = pt.screenshot(f'current_suit.png', region=(16, 501, 30, 30))
+            #gray_suit_screenshot_read = cv.imread(f'current_suit.png')
+            #gray_suit_screenshot = cv.cvtColor(gray_suit_screenshot_read, cv.COLOR_BGR2GRAY)
+            #cv.imwrite('current_suit.png', gray_suit_screenshot)
 
             if not os.listdir('suits'):
                 print('SUITS: direktorij je prazen, zato shranimo nek.png vanj')
-                current = cv.imread('current_suit.png')
+                current_suit = cv.imread('current_suit.png')
                 lenum = random_name()
-                cv.imwrite(f'suits/{lenum}.png', current)
+                cv.imwrite(f'suits/{lenum}.png', current_suit)
 
             else:
                 print('ker SUITS direktorij ni prazen gremo pregledovat ali se katera slika ujame z našo trenutno')
@@ -72,7 +69,6 @@ while True:
                     current = cv.imread('current_suit.png')
                     lenum = random_name()
                     cv.imwrite(f'suits/{lenum}.png', current)
-                #endnewendnew
 
 
         #if directory has no image files, then program automatically adds current template (current_card)
@@ -86,31 +82,9 @@ while True:
             #doestn match with any of the images, than it saves an image in cards directory.
             #when there is 52 cards in directory, the work is done
             for image in os.listdir('cards'):
-                im = cv.imread(f'cards/{image}')
-
-                #res = cv.matchTemplate(current_card, im, method)
-
-                #if im.shape == current_card.shape:
-                    #print("The images have same size and channels")
-
-                difference = cv.subtract(im, current_card)
-                b, g, r = cv.split(difference)
-                #print(b)
-                #print(g)
-                #print(r)
-                if cv.countNonZero(b) == 0 and cv.countNonZero(g) == 0 and cv.countNonZero(r) == 0:
-                    #print('-' * 50)
-                    #table_image = cv.imread('current_table.png')
-                    #res = cv.matchTemplate(im, table_image, method)  # at this method we take min_loc
-                    #min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-
-                    #print(f'min_val: {min_val}, max_val: {max_val}, min_loc: {min_loc}, max_loc: {max_loc}')
-                    #print('-' * 50)
-                    #print('Images are the same')
+                if images_the_same(f'cards/{image}', 'current_card.png'):
                     print('CARDS: slika se ujema z neko sliko v direktoriju, zato prekinemo zanko')
-                    break #if two photos are identical the for loop is broken becouse we know that there is already the
-                    #picture of that card in cards directory
-
+                    break
 
             #if there was no match while looping and comparing template image to images in directory, that means, there
             #is not a picture that is the same to template photo, so, we add image to cards directory
@@ -118,43 +92,56 @@ while True:
                 print('CARDS: slika se ne ujema z nobeno sliko v direktoriju cards, zato jo shranimo vanj')
                 lenum = random_name() #gives random name in string
                 #num = naked_suit() + 1
-                cv.imwrite(f'cards/{lenum}.png', gray_card_screenshot)
+                current_card = cv.imread(f'current_card.png')
+                #gray_card_screenshot = cv.cvtColor(gray_card_screenshot_read, cv.COLOR_BGR2GRAY)
+                cv.imwrite(f'cards/{lenum}.png', current_card)
 
-            #when cards directory reaches lenght of 52, while loop breaks
-        if number_of_files('cards') == 52:
-            print('There are 52 cards in directory already...')
-            break
 
-        print('---------------------smo pred ZADNJO ZANKO:------------------------')
-        for im in os.listdir('cards'):
+    print(f'There are {number_of_files("cards")} cards in cards directory')
+    #when cards directory reaches lenght of 52, while loop breaks
+    if number_of_files('cards') == 52 and number_of_files('suits') == 4:
+        print('There are 52 cards in directory already...')
+        break
 
-            temp = cv.imread(f'cards/{im}')
-            img = cv.imread(f'current_table.png')
-            res = cv.matchTemplate(img, temp, cv.TM_CCOEFF_NORMED) #max_loc for that method
-            threshold = 0.99
-            #loc = np.where(res >= threshold)
+    #loop that checks every table till now, and compares cards, suits and coin with image of table, and search for match in it
+    #if found, it saves coordinates
+    for table in os.listdir('tables'): #for every table image in 'tables' directory
+        img_table = cv.imread(f'tables/{table}')
+        for card in os.listdir('cards'):
+            temp_card = cv.imread(f'cards/{card}')
+            threshold = .99
+            res = cv.matchTemplate(img_table, temp_card, cv.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-            if max_val >= threshold: #if found
-                print('ZADNJA ZANKA: našli smo enako sliko')
-                print(f'trenutna karta: current_table.png : karta iz os.listdir(cards) {im}')
-                print(f'min_val: {min_val}, max_val: {max_val}, min_loc: {min_loc}, max_loc: {max_loc}')
-                print('našli smo max_val == treshold, zato zapišemo koordinate v file')
-                with open('coordinates_of_images/coordinates_of_cards.csv', 'a', newline='') as f:
-                    tup = max_loc
-                    writer = csv.writer(f)
-                    writer.writerow(tup)
-            else:
-                print('ZADNJA ZANKA: ni bilo zadetka')
-                print(f'min_val: {min_val}, max_val: {max_val}, min_loc: {min_loc}, max_loc: {max_loc}')
 
-
-            #print('-' * 50)
-
-        print('---------------KONEC TRENUTNEGA WHILE LOOPA--------------------------------------')
-        print('')
+            if max_val >= threshold:
+                print(f'max val: {max_val}')
+                print(max_loc) #top left coordinates of found image
+                cards_csv(max_loc)
 
 
 
+        for suit in os.listdir('suits'):
+            temp_suit = cv.imread(f'suits/{suit}')
+            threshold = .99
+            res = cv.matchTemplate(img_table, temp_suit, cv.TM_CCOEFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+
+            if max_val >= threshold:
+                print(f'max val: {max_val}')
+                print(max_loc)  # top left coordinates of found image
+                suits_csv(max_loc)
+
+
+        #checks for dealer_coin position on current table
+        temp_dealer_coin = cv.imread(f'dealer_coin/dealer_coin.png')
+        threshold = .99
+        res = cv.matchTemplate(img_table, temp_dealer_coin, cv.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+
+        if max_val >= threshold:
+            print(f'max val: {max_val}')
+            print(max_loc)  # top left coordinates of found image
+            dealer_csv(max_loc)
 
 
 
@@ -166,11 +153,6 @@ while True:
 
 
 
-
-
-
-
-    #image = cv.imread()
 
 
 

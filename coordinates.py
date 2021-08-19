@@ -10,7 +10,7 @@ from random import choice, randint
 method = eval('cv.TM_SQDIFF_NORMED')
 
 
-def coordinates_of_image(template, image): #cv
+def coordinates_of_image(template, image): #opencv
     """
     Func returns left top coordinates where image matched with template image
     :param template: path of template image
@@ -34,24 +34,6 @@ def get_coor(image): #pyautogui
     return
 
 #print(coordinates_of_image('cards/suit0.png', 'current_table.png'))
-
-
-def naked_suit():  #returns number of the title image
-    if len(os.listdir('cards')) == 0:
-        return 0
-    last_one = os.listdir('cards')[-1]
-    print(last_one)
-    first_part = last_one.split('.')[0]
-    print(first_part)
-    number = ''
-    print(number)
-    for i in first_part:
-        if i.isnumeric():
-            print(i)
-            number = number + i
-    return int(number)
-
-
 
 
 def number_of_files(directory):
