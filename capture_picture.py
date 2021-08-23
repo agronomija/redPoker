@@ -12,7 +12,8 @@ import csv
 #this module takes care of getting screenshot images of template images of dealer button, card, suits. Also
 
 def capture_table():
-    """ func takes screenshot of all screen (red star poker should be opened full screen
+    """ func takes screenshot of all screen (red star poker should be opened full screen. then convertes image into
+    gray color and saves it back again in 'current_table' an also saves the same picture in 'tables/random_name.png'
         :return: func takes full screenshot and saves one copy of it in 'current_table.png' and second copy to
         'tables/some_name.png'
     """
@@ -26,7 +27,8 @@ def capture_table():
 
 
 def capture_card(x, y, w, h):
-    """
+    """ func takes screenshot of part of the image from 'current_card.png'. The x,y,h and w are defined by us.
+
 
     :param x: top left x coordinate of captured part of image
     :param y: top left y coordinate of captured part of image
@@ -41,7 +43,7 @@ def capture_card(x, y, w, h):
 
 
 def capture_suit(x, y, w, h):
-    """
+    """ func takes screenshot of part of the image from 'current_suit.png'. The x,y,h and w are defined by us.
 
         :param x: top left x coordinate of captured part of image
         :param y: top left y coordinate of captured part of image
@@ -60,10 +62,9 @@ def capture_suit(x, y, w, h):
     cv.imwrite('current_suit.png', gray_suit_screenshot)
 
 
-
-
 def capture_dealer_coin(x,y,w,h):
-    """
+    """ func takes screenshot of part of the image from f'dealer_coin/dealer_coin.png'.
+    The x,y,h and w are defined by us.
 
             :param x: top left x coordinate of captured part of image
             :param y: top left y coordinate of captured part of image
@@ -75,6 +76,22 @@ def capture_dealer_coin(x,y,w,h):
     gray_card_screenshot_read = cv.imread(f'dealer_coin/dealer_coin.png')
     gray_card_screenshot = cv.cvtColor(gray_card_screenshot_read, cv.COLOR_BGR2GRAY)
     cv.imwrite('dealer_coin/dealer_coin.png', gray_card_screenshot)
+
+
+def capture_money(x, y, w, h):
+    """ func takes screenshot of part of the image from f'dealer_coin/dealer_coin.png'.
+    The x,y,h and w are defined by us.
+
+            :param x: top left x coordinate of captured part of image
+            :param y: top left y coordinate of captured part of image
+            :param w: width of captured part of image
+            :param h: height of captured part of image
+            :return: func takes a screenshot of part of an image and then saves it to 'persons_money/money.png'
+    """
+    money_screenshot = pt.screenshot(f'persons_money/money.png', region=(x, y, w, h))
+    gray_money_screenshot_read = cv.imread(f'persons_money/money.png')
+    gray_money_screenshot = cv.cvtColor(gray_money_screenshot_read, cv.COLOR_BGR2GRAY)
+    cv.imwrite(f'persons_money/money.png', gray_money_screenshot)
 
 
 

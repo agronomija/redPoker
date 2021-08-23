@@ -6,9 +6,9 @@ import sys
 import os
 import numpy as np
 from random import choice, randint
+import csv
 
 method = eval('cv.TM_SQDIFF_NORMED')
-
 
 def coordinates_of_image(template, image): #opencv
     """
@@ -17,6 +17,7 @@ def coordinates_of_image(template, image): #opencv
     :param image: path of image
     :return: tuple of coordinates where picture is located (left top corner?)
     """
+    method = eval('cv.TM_SQDIFF_NORMED')
     image = cv.imread(image)
     temp = cv.imread(template)
     res = cv.matchTemplate(image, temp, method)  # at this method we take min_loc
@@ -37,6 +38,11 @@ def get_coor(image): #pyautogui
 
 
 def number_of_files(directory):
+    """
+    func counts number of files in some directory defined by us
+    :param directory: path of some directory where files are in
+    :return: number of files in directory
+    """
     return len(os.listdir(f'{directory}'))
 
 
@@ -45,11 +51,13 @@ def number_of_files(directory):
 #print(pt.locateOnScreen('cards/suit1.png'))
 
 def images_the_same(image1, image2):
-    """
+    """compares two images if they are identical
 
     :param image1: path of image1
     :param image2: path of image2
     :return: True if images are the same, False if images are not the same
+    """
+
     """
     im1 = cv.imread(image1)
     im2 = cv.imread(image2)
@@ -63,8 +71,19 @@ def images_the_same(image1, image2):
     if cv.countNonZero(b) == 0 and cv.countNonZero(g) == 0 and cv.countNonZero(r) == 0:
         return True
     return False
+    """
+    im1 = cv.imread(image1)
+    im2 = cv.imread(image2)
 
-#print(images_the_same('cards/suit1.png', 'cards/suit1.png'))
+    if im1.shape != im2.shape:
+        return False
+
+    difference = cv.absdiff(im1, im2)
+    d = (difference == 0).all()
+    return d
+
+
+#print(images_the_same('cards/firstone.png', 'current_card.png'))
 #print(time.process_time())
 
 
@@ -74,8 +93,13 @@ def images_the_same(image1, image2):
 
 
 def random_name():
+    """
+
+    :return: returns random combination of random number and three random lettters
+    """
     num = randint(1, 1000)
-    letter = choice(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',                 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'z'])
+    letter = choice(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+                     'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'z'])
     return f'{num}{letter}'
 
 #im1 = cv.imread('suits/806g.png')
@@ -87,3 +111,24 @@ def random_name():
     #print('sliki nista istih dimenziji')
 
 #print(images_the_same('suits/806g.png', 'current_table.png'))
+
+"""
+print('pizda')
+im1 = cv.imread('current_card.png')
+im2 = cv.imread('cards/firstone.png')
+
+print(im1.shape)
+print(im2.shape)
+if im1.shape != im2.shape:
+    print('sliki nista istih dimenzij')
+else:
+    print('sliki sta enakih dimenzij')
+
+difference = cv.absdiff(im1, im2)
+#b, g, r = cv.split(difference)
+print((difference == 0).all())
+#print(d.sum())
+print(time.process_time())
+"""
+
+
