@@ -94,12 +94,10 @@ while True:
 
             #if there was no match while looping and comparing template image to images in directory, that means, there
             #is not a picture that is the same to template photo, so, we add image to cards directory
-            else:  #newnew
+            else:
                 print('CARDS: slika se ne ujema z nobeno sliko v direktoriju cards, zato jo shranimo vanj')
                 lenum = random_name() #gives random name in string
-                #num = naked_suit() + 1
                 current_card = cv.imread(f'current_card.png')
-                #gray_card_screenshot = cv.cvtColor(gray_card_screenshot_read, cv.COLOR_BGR2GRAY)
                 cv.imwrite(f'cards/{lenum}.png', current_card)
 
 
