@@ -46,12 +46,12 @@ def all_pos_and_cards(filename):
 
 
 
-def last_call():
+def last_call_cards():
     lc, hc = card_l_h = 59, 59 #lenght and height of cards
-    ls, hs = suit_l_h = 60, 60 #lenght and height of suits
+    #ls, hs = suit_l_h = 30, 30 #lenght and height of suits
 
     coor_cards = list_of_coordinates('coordinates_of_images/coordinates_of_cards.csv')
-    coor_suits = list_of_coordinates('coordinates_of_images/coordinates_of_suits.csv')
+    #coor_suits = list_of_coordinates('coordinates_of_images/coordinates_of_suits.csv')
     #coor_money = list_of_coordinates('coordinates_of_images/coordinates_of_money.csv')
     for table in os.listdir('tables'):
         img_table = cv.imread(f'tables/{table}')
@@ -65,11 +65,44 @@ def last_call():
             for saved_card in os.listdir('cards'): #for every card in 'cards' directory
                 card1 = cv.imread(f'cards/{saved_card}') #read card
                 if images_the_same_last_call(card, card1):
+                    print('našli smo isto karto zato break')
                     break
             else:
-                cv.imwrite('krneki.png', card)
+                cv.imwrite(f'cards/{random_name()}.png', card)
 
-last_call()
+
+
+def last_call_suits():
+    #lc, hc = card_l_h = 59, 59 #lenght and height of cards
+    ls, hs = suit_l_h = 30, 30 #lenght and height of suits
+
+    #coor_cards = list_of_coordinates('coordinates_of_images/coordinates_of_cards.csv')
+    coor_suits = list_of_coordinates('coordinates_of_images/coordinates_of_suits.csv')
+    #coor_money = list_of_coordinates('coordinates_of_images/coordinates_of_money.csv')
+
+    for table in os.listdir('tables'):
+        img_table = cv.imread(f'tables/{table}')
+
+        for x, y in coor_suits: #for every coordinate in 'coordinates_of_cards.csv'
+            x = int(x)
+            y = int(y)
+            suit = img_table[y:y + ls, x:x+hs]
+            #part of main image
+
+            for saved_suit in os.listdir('suits'): #for every card in 'cards' directory
+                suit1 = cv.imread(f'suits/{saved_suit}') #read card
+                if images_the_same_last_call(suit, suit1):
+                    print('našli smo isto karto zato break')
+                    break
+            else:
+                cv.imwrite(f'suits/{random_name()}.png', suit)
+
+
+
+if __name__ == '__main__':
+    #last_call_cards()
+    im = cv.imread('suits/375p.png')
+    print(im.shape)
 
 
             #suit = cv.imread(img_table[x:x+hs, y:y + ls])

@@ -11,6 +11,7 @@ import csv
 from capture_picture import capture_card, capture_dealer_coin, capture_suit, capture_table, capture_money
 from dealing_with_csv import cards_csv, suits_csv, dealer_csv, number_of_coordinates, money_csv
 import winsound
+from find_card import last_call_cards, last_call_suits
 
 #print((3,3,3) == (2,2,2))
 #print(cv.imread('cards/suit0.png'))
@@ -100,80 +101,100 @@ while True:
                 current_card = cv.imread(f'current_card.png')
                 cv.imwrite(f'cards/{lenum}.png', current_card)
 
+        #od tukaj moras premaknit nazaj
+        #loop that checks every table till now, and compares cards, suits and coin with image of table, and search for match in it
+        #if found, it saves coordinates
+        for table in os.listdir('tables'): #for every table image in 'tables' directory
+            img_table = cv.imread(f'tables/{table}')
 
-    print(f'There are {number_of_files("cards")} cards in cards directory')
-    #when cards directory reaches lenght of 52, while loop breaks
-    if number_of_files('cards') == 52 and number_of_files('suits') == 4:
-        frequency = 2500  # Set Frequency To 2500 Hertz
-        duration = 1000  # Set Duration To 1000 ms == 1 second
-        winsound.Beep(frequency, duration)
-        print('There are 52 cards in directory already...')
-        break
+            if number_of_coordinates('coordinates_of_images/coordinates_of_cards.csv') <= 7:
+                print('coor cards')
+                for card in os.listdir('cards'):
+                    temp_card = cv.imread(f'cards/{card}')
+                    threshold = .99
+                    res = cv.matchTemplate(img_table, temp_card, cv.TM_CCOEFF_NORMED)
+                    min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
 
-    #loop that checks every table till now, and compares cards, suits and coin with image of table, and search for match in it
-    #if found, it saves coordinates
-    for table in os.listdir('tables'): #for every table image in 'tables' directory
-        img_table = cv.imread(f'tables/{table}')
+                    if max_val >= threshold:
+                        print(f'max val: {max_val}')
+                        print(max_loc) #top left coordinates of found image
+                        cards_csv(max_loc)
 
-        if number_of_coordinates('coordinates_of_images/coordinates_of_cards.csv') < 7:
-            print('coor cards')
-            for card in os.listdir('cards'):
-                temp_card = cv.imread(f'cards/{card}')
+            if number_of_coordinates('coordinates_of_images/coordinates_of_suits.csv') <= 7:
+                print('coor suit')
+                for suit in os.listdir('suits'):
+                    temp_suit = cv.imread(f'suits/{suit}')
+                    threshold = .99
+                    res = cv.matchTemplate(img_table, temp_suit, cv.TM_CCOEFF_NORMED)
+                    min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+
+                    if max_val >= threshold:
+                        print(f'max val: {max_val}')
+                        print(max_loc)  # top left coordinates of found image
+                        suits_csv(max_loc)
+
+            if number_of_coordinates('coordinates_of_images/coordinates_of_dealer.csv') <= 9:
+                print('coor dealer')
+                #checks for dealer_coin position on current table
+                temp_dealer_coin = cv.imread(f'dealer_coin/dealer_coin.png')
                 threshold = .99
-                res = cv.matchTemplate(img_table, temp_card, cv.TM_CCOEFF_NORMED)
-                min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-
-                if max_val >= threshold:
-                    print(f'max val: {max_val}')
-                    print(max_loc) #top left coordinates of found image
-                    cards_csv(max_loc)
-
-        if number_of_coordinates('coordinates_of_images/coordinates_of_suits.csv') < 7:
-            print('coor suit')
-            for suit in os.listdir('suits'):
-                temp_suit = cv.imread(f'suits/{suit}')
-                threshold = .99
-                res = cv.matchTemplate(img_table, temp_suit, cv.TM_CCOEFF_NORMED)
+                res = cv.matchTemplate(img_table, temp_dealer_coin, cv.TM_CCOEFF_NORMED)
                 min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
 
                 if max_val >= threshold:
                     print(f'max val: {max_val}')
                     print(max_loc)  # top left coordinates of found image
-                    suits_csv(max_loc)
-
-        if number_of_coordinates('coordinates_of_images/coordinates_of_dealer.csv') < 10:
-            print('coor dealer')
-            #checks for dealer_coin position on current table
-            temp_dealer_coin = cv.imread(f'dealer_coin/dealer_coin.png')
-            threshold = .99
-            res = cv.matchTemplate(img_table, temp_dealer_coin, cv.TM_CCOEFF_NORMED)
-            min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-
-            if max_val >= threshold:
-                print(f'max val: {max_val}')
-                print(max_loc)  # top left coordinates of found image
-                dealer_csv(max_loc)
+                    dealer_csv(max_loc)
 
 
-        if number_of_coordinates('coordinates_of_images/coordinates_of_money.csv') < 10: #if there is not yet 10 positions of money in dir 'coor_...
-            print('coor money')
-            #checks for all money positions on current table
-            temp_dealer_coin = cv.imread(f'persons_money/money.png')
-            #threshold = .85
-            #res = cv.matchTemplate(img_table, temp_dealer_coin, cv.TM_CCOEFF_NORMED)
-            #min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
-            """
-            if max_val >= threshold:
-                print(f'max val: {max_val}')
-                print(max_loc)  # top left coordinates of found image
-                money_csv(max_loc)  #saves new coordinates to 'coordinates_pf_money.csv'
-            """
-            res = cv.matchTemplate(img_table, temp_dealer_coin, cv.TM_CCOEFF_NORMED)
-            threshold = 0.99
-            loc = np.where(res >= threshold)
-            for pt in zip(*loc[::-1]):
-                print('lokacija: ', pt)
-                money_csv(pt)
+            if number_of_coordinates('coordinates_of_images/coordinates_of_money.csv') <= 9: #if there is not yet 10 positions of money in dir 'coor_...
+                print('coor money')
+                #checks for all money positions on current table
+                temp_money = cv.imread(f'persons_money/money.png')
+                #threshold = .85
+                #res = cv.matchTemplate(img_table, temp_dealer_coin, cv.TM_CCOEFF_NORMED)
+                #min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+                """
+                if max_val >= threshold:
+                    print(f'max val: {max_val}')
+                    print(max_loc)  # top left coordinates of found image
+                    money_csv(max_loc)  #saves new coordinates to 'coordinates_pf_money.csv'
+                """
+                res = cv.matchTemplate(img_table, temp_money, cv.TM_CCOEFF_NORMED)
+                min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
+                threshold = 0.99
+                #loc = np.where(res >= threshold)
+                """
+                for pt in zip(*loc[::-1]):
+                    print('lokacija: ', pt)
+                    money_csv(pt)
+                """
+                if max_val >= threshold:
+                    print(f'max val: {max_val}')
+                    print(max_loc)  # top left coordinates of found image
+                    money_csv(max_loc)
+
+
+        print(time.process_time())
+        cards_in_cards = number_of_files('cards')
+
+        print(f'There are {number_of_files("cards")} cards in cards directory')
+        # when cards directory reaches lenght of 52, while loop breaks
+        if number_of_files('cards') >= 52:
+            frequency = 2500  # Set Frequency To 2500 Hertz
+            duration = 1000  # Set Duration To 1000 ms == 1 second
+            winsound.Beep(frequency, duration)
+            print('There are 52 cards in directory already...')
+            break
+
+        else:
+            last_call_cards()
+            if len(os.listdir('suits')) != 4:
+                last_call_suits()
+        print(time.process_time())
+
+    else:
+        continue
 
 
 
