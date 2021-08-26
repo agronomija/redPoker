@@ -8,6 +8,7 @@ import numpy as np
 from coordinates import number_of_files, images_the_same, coordinates_of_image, random_name
 from random import randint, choice
 import csv
+import winsound
 
 #this module takes care of getting screenshot images of template images of dealer button, card, suits. Also
 
@@ -100,15 +101,23 @@ def mouse_coordinates(): #to approximatly get coordinates of some object on the 
     return pt.position()
 
 
+def beep_beep():
+    frequency = 2500  # Set Frequency To 2500 Hertz
+    duration = 500  # Set Duration To 1000 ms == 1 second
+    winsound.Beep(frequency, duration)
+
+
+
+
 
 if __name__ == '__main__':
-    temp = cv.imread(f'card_capture.png')
+    temp = cv.imread(f'current_card.png')
     for im in os.listdir('tables'):
 
         img = cv.imread(f'tables/{im}')
 
         threshold = 0.99
-        roi = img[500:600, 16: 100]
+        roi = img[500:600, 16: 50] #najprej je y, nato x
         res = cv.matchTemplate(roi, temp, cv.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv.minMaxLoc(res)
 
@@ -125,7 +134,6 @@ if __name__ == '__main__':
 
 
 #1. first get coordinates of where you want to cut pictures.
-
 
 
 

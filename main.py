@@ -8,16 +8,11 @@ import numpy as np
 from coordinates import number_of_files, images_the_same, coordinates_of_image, random_name
 from random import randint, choice
 import csv
-from capture_picture import capture_card, capture_dealer_coin, capture_suit, capture_table, capture_money
+from capture_picture import capture_card, capture_dealer_coin, capture_suit, capture_table, capture_money, beep_beep
 from dealing_with_csv import cards_csv, suits_csv, dealer_csv, number_of_coordinates, money_csv
 import winsound
 from find_card import last_call_cards, last_call_suits
 
-#print((3,3,3) == (2,2,2))
-#print(cv.imread('cards/suit0.png'))
-#print(cv.imread('cards/suit0.png').shape == cv.imread('current_card.png').shape)
-#print('-' * 50)
-#print(cv.imread('current_card.png').shape)
 time.sleep(3)
 print('zdaj')
 
@@ -25,13 +20,17 @@ method = eval('cv.TM_SQDIFF_NORMED') #comparison method
 while True:
     key_pressed = keyboard.read_key()
     if key_pressed == 'p':
-        #takes screen shot of the table, than reads image trough cv,
-        # than convertes it in gray color and than saves it in directory
+        beep_beep()
+        beep_beep()
+        beep_beep()
+        #takes screen shot of the table, than reads image with cv,
+        # than convertes it in gray color and saves it in directory
         capture_table() #takes screnshot of full screen...
 
         #same as table screenshot, only that here takes a screenshot of a
         # region of the same picture (takes a screenshot of a card)
         capture_card(16,501,59,59) #screenshot my left card and saves it as 'current_card.png'
+                #### X,  y, W, H
         current_card = cv.imread('current_card.png')
 
 
@@ -48,10 +47,7 @@ while True:
         if len(os.listdir('suits')) != 4:
             capture_suit(16,501,30,30)
             #takes smaller screenshot area, only to capture suit of the card
-            #suit_screenshot = pt.screenshot(f'current_suit.png', region=(16, 501, 30, 30))
-            #gray_suit_screenshot_read = cv.imread(f'current_suit.png')
-            #gray_suit_screenshot = cv.cvtColor(gray_suit_screenshot_read, cv.COLOR_BGR2GRAY)
-            #cv.imwrite('current_suit.png', gray_suit_screenshot)
+
 
             if not os.listdir('suits'):
                 print('SUITS: direktorij je prazen, zato shranimo nek.png vanj')

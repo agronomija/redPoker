@@ -13,6 +13,7 @@ from capture_picture import capture_card, capture_dealer_coin, capture_suit, cap
 from dealing_with_csv import cards_csv, suits_csv, dealer_csv, money_csv, number_of_coordinates
 import winsound
 
+"""
 filename = 'coordinates_of_images/coordinates_of_cards.csv'
 def all_pos_and_cards(filename):
 
@@ -43,10 +44,17 @@ def all_pos_and_cards(filename):
                         print('zapisujem')
                         cv.imwrite('dodana.png', roi)
 
-
+"""
 
 
 def last_call_cards():
+    """
+    func opens csv file with coordinaes of images, then loops trough directory of 'tables', and for every table in 'tables'
+    directory loops trough over all coordinates. With these coordinates and lc, hc we cut template image out of table image.
+    Then function compares this template image to every image in 'cards' directory and if there is no match, we save this
+    template image to 'cards' directory.
+    :return: None, saves new card in 'cards' dir if there is not yet saved this card image
+    """
     lc, hc = card_l_h = 59, 59 #lenght and height of cards
     #ls, hs = suit_l_h = 30, 30 #lenght and height of suits
 
@@ -73,6 +81,13 @@ def last_call_cards():
 
 
 def last_call_suits():
+    """
+        func opens csv file with coordinaes of images, then loops trough directory of 'tables', and for every table in 'suits'
+        directory loops trough over all coordinates. With these coordinates and lc, hc we cut template image out of table image.
+        Then function compares this template image to every image in 'cards' directory and if there is no match, we save this
+        template image to 'suits' directory.
+        :return: None, saves new card in 'cards' dir if there is not yet saved this suit image
+        """
     #lc, hc = card_l_h = 59, 59 #lenght and height of cards
     ls, hs = suit_l_h = 30, 30 #lenght and height of suits
 
